@@ -15,11 +15,27 @@ public class Neurona {
 
 	public Neurona(int entradas) {
 		this.pesos = new double[entradas];
+		java.util.Random dado = new java.util.Random();
 		// Relleno aleatorio. Porque si se estan creando es que aún n osabe nada
+		double scale = Math.sqrt(2.0 / entradas); // He init. Es un modo de randomizar mejorado
+		// Si tienes muchas neuronas, los pesos deben ser pequeños, por eso randomizamos
+		// según las entradas
 		for (int i = 0; i < entradas; i++) {
-			this.pesos[i] = Math.random() - 0.5;
+			// Box–Muller para normal(0,1). Esto es lo del he init. Que al parecer es asi
+			double u = Math.max(1e-12, dado.nextDouble());
+			double v = Math.max(1e-12, dado.nextDouble());
+			double z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+			this.pesos[i] = z * scale;
 		}
-		this.sesgo = Math.random() - 0.5;
+		this.sesgo = 0.0;
+	}
+
+	static double clip(double v, double lim) { // limita el tamaño maximo del gradiente
+		if (v > lim)
+			return lim;
+		if (v < -lim)
+			return -lim;
+		return v;
 	}
 
 	public double activar(double[] entrada, Funcion f) {// basicamente, usar la neurona. Se le llama forward.
@@ -46,6 +62,10 @@ public class Neurona {
 		// Esto es: ¿Que parte del error global le corresponde a esta neurona?
 		double gradSumaPonderada = gradSalida * gradEntradaActivacion; // multiplica el fallo que nos envía la capa
 																		// siguiente * la derivada que tenga esta
+
+		gradSumaPonderada = clip(gradSumaPonderada, 15.0); // esto evita que un gradiente enorme joda el resto de la
+															// red, por eso le pones un limite flow 100
+
 		double[] pesosAnteriores = pesos.clone();// guardamos los viejos
 
 		actualizarPesos(gradSumaPonderada, tasaAprendizaje);
