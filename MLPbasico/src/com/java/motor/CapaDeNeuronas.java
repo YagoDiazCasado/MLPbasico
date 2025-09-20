@@ -8,8 +8,6 @@ public class CapaDeNeuronas {
 	private Funcion f;
 	private List<Neurona> neuronas = new ArrayList<Neurona>(); // la longitud de esto es la enrada de las neuronas de la
 	private int numDeNeuronasCapaAnterior;
-	// sigueitne
-	// capa
 
 	public CapaDeNeuronas(int numSalidaCapaAnterior, int numeroDeNeuronasEnEstaCapa, Funcion f) {
 		this.f = f;

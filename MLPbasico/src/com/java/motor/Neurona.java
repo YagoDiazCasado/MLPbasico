@@ -46,22 +46,25 @@ public class Neurona {
 		// Esto es: ¿Que parte del error global le corresponde a esta neurona?
 		double gradSumaPonderada = gradSalida * gradEntradaActivacion; // multiplica el fallo que nos envía la capa
 																		// siguiente * la derivada que tenga esta
+		double[] pesosAnteriores = pesos.clone();// guardamos los viejos
 
 		actualizarPesos(gradSumaPonderada, tasaAprendizaje);
 
 		double[] gradEntradas = new double[pesos.length];
 		for (int i = 0; i < pesos.length; i++) {
-			gradEntradas[i] = pesos[i] * gradSumaPonderada;
+			gradEntradas[i] = pesosAnteriores[i] * gradSumaPonderada; // aqui chekeamos los pesos viejos para ver cuanto
+																		// habían divergido
 		}
 
-		return gradEntradas; // esto se pasa a la capa anterior para que haga lo mismo
+		return gradEntradas; // esto se pasa a la capa anterior para que haga lo mismo. Así saben cuanto la
+								// cagó esta neurona y se ajustas en consecuencia
 	}
 
 	public void actualizarPesos(double error, double tasaAprendizaje) { // esto es para que aprenda
 		for (int i = 0; i < pesos.length; i++) {
-			pesos[i] += tasaAprendizaje * error * anteriorEntrada[i];
+			pesos[i] -= tasaAprendizaje * error * anteriorEntrada[i];
 		}
-		sesgo += tasaAprendizaje * error;
+		sesgo -= tasaAprendizaje * error;
 	}
 
 	public double[] getAnteriorEntrada() {
